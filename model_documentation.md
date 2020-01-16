@@ -44,3 +44,12 @@ I define a struct `Trajectory` to encapsulate all the data for generating waypoi
    * `change_lane_trajectory()`: if we want to change lane, the `target_d` definitely should be the d value of intended lane, `target_s` is still the end s of previous path plus 30.  For `final_s` and `final_speed`, we also use sensor fusion data to find if there is a car ahead in the intended lane, I don't change the ref velocity when changing lane, because it will soon switch to __KL__ state in next cycle, it's enough for __KL__ state to control the speed.
    * `get_adjacent_car()`: use sensor fusion data to get the closest car behind/ahead the ego for a specific lane.
    * `generate_waypoints()`: use `target_s, target_d` and the end points of previous path to generate anchor points, then use `spline` tool and `target_velocity` to calculate interpolated points, then mix them with previous path to generate the next waypoints.
+   
+After we get the next trajectory, we need to calculate the cost of each trajectory
+
+   * `calculate_cost()`: actually it calculates 3 costs of each trajectory, and then get a weighted average as the final cost.
+      * `inefficiency_cost()`: to reward the most fast trajectory
+      * `goal_distance_cost()`: to keep lane when the speed of all the lanes are very close, or to change a lane when the distance to the car ahead is much more than the current lane.
+      * `check_collision()`: it use sensor fusion data to predict the closest car ahead/behind on the intended lane, and then calculate the distance of them with the ego car, if the distance is too small, then the collision will happen. Because collision is the most unacceptable situation, if collision will happen, return a maximum total cost of 1 directly.
+      
+Finally, we sort the costs, choose a trajectory with a minimum cost, then return it to the `onMessage(...)` function in `main.cpp`.
