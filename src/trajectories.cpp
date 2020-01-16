@@ -20,9 +20,9 @@ int get_lane(const double &_d)
   return floor(_d / 4);
 }
 
-double inefficiency_cost(const double &_target_speed, const double &_intented_speed) 
+double inefficiency_cost(const double &_target_speed, const double &_intented_speed, const double &_curr_speed) 
 {
-  return (_target_speed - _intented_speed) / _target_speed;
+  return 0.5 * (2.0 * _target_speed - _intented_speed - _curr_speed) / _target_speed;
 }
 
 double goal_distance_cost(double delta_d, double delta_s) 
@@ -101,7 +101,7 @@ double calculate_cost(const Trajectory &_trajectory,
                       const vector<vector<double>> &_sensor_fusion,
                       const Map &_map)
 {
-  double ineffi_cost = inefficiency_cost(MAX_VELOCITY, _trajectory.final_speed);
+  double ineffi_cost = inefficiency_cost(MAX_VELOCITY, _trajectory.final_speed, _curr_pose.speed);
   
   double delta_d = get_lane(_trajectory.target_d) - get_lane(_curr_pose.d); //maybe it should be the s/d of prev path
   double delta_s = _trajectory.final_s - _curr_pose.s;

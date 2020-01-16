@@ -77,7 +77,7 @@ struct Map
 int get_lane(const double &_d);
 
 double goal_distance_cost(double delta_d, double delta_s);
-double inefficiency_cost(const double &_target_speed, const double &_intented_speed); 
+double inefficiency_cost(const double &_target_speed, const double &_intented_speed, const double &_curr_speed); 
 double calculate_cost(const Trajectory &_trajectory, 
                       const VehiclePose &_curr_pose, 
                       const vector<vector<double>> &_sensor_fusion,
