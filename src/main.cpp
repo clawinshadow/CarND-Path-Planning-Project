@@ -7,11 +7,16 @@
 #include "Eigen-3.3/Eigen/QR"
 #include "helpers.h"
 #include "json.hpp"
+#include "spline.h"
+#include "trajectories.h"
 
 // for convenience
 using nlohmann::json;
 using std::string;
 using std::vector;
+
+string state = "KL";
+int lane = 1;
 
 int main() {
   uWS::Hub h;
@@ -76,6 +81,9 @@ int main() {
           double car_d = j[1]["d"];
           double car_yaw = j[1]["yaw"];
           double car_speed = j[1]["speed"];
+          
+          //debug
+          //printf("ego car speed: %f\n", car_speed);
 
           // Previous path data given to the Planner
           auto previous_path_x = j[1]["previous_path_x"];
@@ -83,21 +91,28 @@ int main() {
           // Previous path's end s and d values 
           double end_path_s = j[1]["end_path_s"];
           double end_path_d = j[1]["end_path_d"];
+          
+          //printf("car_s: %f, end_path_s: %f \n", car_s, end_path_s);
 
           // Sensor Fusion Data, a list of all other cars on the same side 
           //   of the road.
-          auto sensor_fusion = j[1]["sensor_fusion"];
+          vector<vector<double>> sensor_fusion = j[1]["sensor_fusion"];
+          
+          //prepare data
+          VehiclePose curr_pose(car_x, car_y, car_s, car_d, car_yaw, car_speed);
+          PreviousPath prev_path(end_path_s, end_path_d, previous_path_x, previous_path_y);
+          Map map(map_waypoints_x, map_waypoints_y, map_waypoints_s);
 
+          //path planning
+          Trajectory next_traj = get_trajectory(state, lane, curr_pose, sensor_fusion, prev_path, map);
+          
+          //update status
+          state = next_traj.state;
+          lane = get_lane(next_traj.target_d);
+          vector<double> next_x_vals = next_traj.waypoints[0];
+          vector<double> next_y_vals = next_traj.waypoints[1];
+          
           json msgJson;
-
-          vector<double> next_x_vals;
-          vector<double> next_y_vals;
-
-          /**
-           * TODO: define a path made up of (x,y) points that the car will visit
-           *   sequentially every .02 seconds
-           */
-
 
           msgJson["next_x"] = next_x_vals;
           msgJson["next_y"] = next_y_vals;
