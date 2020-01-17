@@ -396,7 +396,7 @@ Trajectory keep_lane_trajectory(const int &_lane,
   }
   else
   {
-    result.final_s = result.target_s + 1000;
+    result.final_s = result.target_s + 300;
     result.final_speed = MAX_VELOCITY;
   }
   
@@ -404,14 +404,14 @@ Trajectory keep_lane_trajectory(const int &_lane,
   {
     // if too close, then brake the car, decrease speed to the same as the car ahead
     if (ref_velocity > car_ahead.speed)
-      ref_velocity = ref_velocity - 1.12;
+      ref_velocity = ref_velocity - 0.224;
     else
       ref_velocity = car_ahead.speed;
   }
   else
   {
     if (ref_velocity < MAX_VELOCITY)
-      ref_velocity = ref_velocity + 1.12;
+      ref_velocity = ref_velocity + 0.224;
   }
   
   //debug
@@ -460,7 +460,7 @@ Trajectory change_lane_trajectory(const int &_lane,
   }
   else
   {
-    result.final_s = result.target_s + 1000;
+    result.final_s = result.target_s + 300;
     result.final_speed = MAX_VELOCITY;
   }
   //debug
